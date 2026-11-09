@@ -22,7 +22,7 @@ The free plan can't publish to live or add collaborators, so I'm sharing the ver
 ## 1. What I built
 
 - **Author portal** (`dashboard`): the author sees only their own books, with ISBN, genre, status, publication date, MRP, platforms, copies sold, earned, paid, pending and last payout date. Totals at the top and a green / yellow / red / grey badge on each book.
-- **Admin portal** (`admin`): list of all authors with city, total books, total earned and pending. Search by name, filter by city and by status (fully paid / pending / overdue). A notification log at the bottom.
+- **Admin portal** (`admin`): list of all authors with city, total books, total earned and pending. Search by name, filter by city and by status (fully paid / pending / overdue). A bulk button that sends summaries to every author with pending royalties, and a notification log at the bottom.
 - **Author detail** (`admin_author`): the same view the author gets, plus payout history, notification history and the **Generate & Send Royalty Summary** button.
 - **n8n workflow**: gets the request from Bubble, checks it, works out the numbers, asks Gemini to write the email, checks the email, and sends the result back to Bubble.
 
@@ -35,6 +35,8 @@ The free plan can't publish to live or add collaborators, so I'm sharing the ver
 5. n8n validates it, calculates the totals and payout dates, calls Gemini, and checks the email it gets back.
 6. n8n replies with the result (status, subject, email body, model, error if any).
 7. Bubble saves that into the same log row as *Success* or *Failed*. The admin sees it in the notification log.
+
+**Bulk send** reuses the same steps. The button puts every author with pending royalties (9 in the dataset) into a list in a page custom state (`bulk_queue`) and starts a custom event, `process_next`. That event takes the first author in the list, creates the log with trigger type *Bulk*, calls n8n, saves the result, removes the author from the list, and schedules itself again 5 seconds later until the list is empty. The 5-second gap keeps it inside Gemini's free rate limit. The button shows "Sending..." and can't be clicked while the list isn't empty. I first planned this with "Schedule API workflow on a list" (a backend loop), but that's blocked on the free plan (see below), so the loop runs on the page.
 
 ### Why the data goes in the webhook (and not through the Data API)
 
@@ -132,10 +134,9 @@ There is no spinner: the log row is created first, so it always ends up as Succe
 
 **Double clicks:** the button only runs if there's no Processing or Success log for that author in the last 5 minutes. n8n also refuses a log id it has already processed.
 
-## 8. What I couldn't finish, and what I'd change
+## 8. Limitations and what I'd change
 
-- **Bulk send button (not built).** It needs a loop that calls n8n once per author. My first plan was "Schedule API workflow on a list", which runs the backend workflow I already built (`trigger_summary_for_author`) for every author with pending royalties, 5 seconds apart. That approach is blocked on the free plan because backend workflows can't make the API Connector call.
-  A front-end loop would work on the free plan: the button puts all authors with pending royalties into a list in a page custom state, and a custom event takes the first author, runs the same steps as the Generate & Send button (create log, call n8n, save the result), removes that author from the list, and schedules itself again 5 seconds later until the list is empty. The admin would need to keep the page open while it runs. I worked this out late and didn't have time to build and test it before the deadline. The n8n side needs no change, since it already accepts `trigger_type = "Bulk"`.
+- **Bulk send runs in the browser.** Because of the backend limit above, the bulk loop is a front-end loop, so the admin has to keep the admin page open until it finishes (about 30 seconds per author). On a paid plan I'd move it to "Schedule API workflow on a list" so it runs on the server.
 - **Collaborator access**: Bubble asked for an upgrade when I tried to invite.
 - The name search is case-sensitive, and the city/status dropdowns have no "All" option, so clearing a filter needs a page refresh.
 - The ₹1,000 minimum is handled in the email but not in the badge and filter, so AUTH009 shows red in the UI.
@@ -159,4 +160,4 @@ The most useful skill was **debugging across two systems**. When the log stayed 
 
 I used AI tools while building: for planning the structure, for the n8n code, and Bubble's own AI agent for some page layouts. Once the agent hid everything on the admin page, so I reverted its change and fixed the page by hand. I made sure I understand every workflow and n8n node so I can explain them.
 
-With more time I'd make the royalty view a reusable element shared by the author and admin pages, add a reset button to the filters, and build the bulk send as a front-end loop.
+With more time I'd make the royalty view a reusable element shared by the author and admin pages, add a reset button to the filters, and on a paid plan move the bulk loop to the server.
