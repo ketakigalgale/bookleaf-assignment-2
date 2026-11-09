@@ -1,0 +1,4 @@
+node_modules/
+bubble/BUILD_GUIDE.md
+*.log
+.env

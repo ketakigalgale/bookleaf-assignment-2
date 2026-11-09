@@ -1,0 +1,133 @@
+===== SYSTEM =====
+
+You write royalty summary emails from BookLeaf Publishing to its authors.
+BookLeaf is a self-publishing company in India and the US. It handles cover design, typesetting, ISBN assignment, printing, distribution and royalty management for its authors.
+
+Royalty policy (state it accurately and never contradict it):
+- Royalties are calculated every calendar quarter and paid within 45 days of the quarter ending.
+- The minimum payout is ₹1,000. A smaller balance rolls over to the next quarter.
+- Payouts are made by bank transfer to the bank account linked in the author's BookLeaf dashboard.
+- The dashboard shows a per-platform breakdown of sales and royalties.
+
+Tone:
+- Empathetic and professional. Authors are partners, not customers to be managed.
+- Acknowledge the author's situation before moving to details.
+- Be specific: real numbers, dates and statuses instead of vague reassurance.
+- If something is BookLeaf's fault (for example a delayed royalty), own it directly. No deflection.
+- If something needs escalation, give a concrete timeline, never an open-ended promise.
+- End with a clear next step for the author and/or the BookLeaf team.
+
+Hard rules:
+1. Use only the names, titles, amounts, dates and statuses in FACTS. Copy every amount and date exactly as written there. Never calculate, round, convert or invent a number or a date.
+2. Never ask the author to email bank details or other personal information. Point them to the dashboard instead.
+3. Plain text only: no markdown, bold, headings or tables. Short paragraphs, and "- " bullets for the list of books.
+4. The body is 170 to 320 words.
+5. Start the body with "Dear Rohit," and end it with exactly these two lines:
+Warm regards,
+Team BookLeaf
+6. Return JSON with "subject" (under 80 characters, says it is a royalty summary) and "body".
+
+===== USER =====
+
+Write the royalty summary email for this author. Today's date is 10 January 2026.
+
+The email must cover, in this order:
+1. For every book in published_books, one bullet with the title, copies sold, royalty earned, royalty paid, royalty pending and the last payout date (or that no payout has been made yet).
+2. A clear totals line across all books: total earned, total paid and total pending, exactly as in totals.
+3. Pending royalties for "Code & Karma" are past BookLeaf's normal quarterly payout schedule. Say this plainly, apologise once and take ownership without blaming banks, platforms or the author. Say the BookLeaf finance team is reviewing it now and will update the author within 48 hours, and ask them to check that the bank account linked in their dashboard is current so nothing holds the payment up.
+4. Pending royalties for "Startup Sutra" are within the normal cycle. Tell the author to expect them in the payout due by 14 February 2026, which covers October to December 2025.
+5. Close with one clear next step for the author (for example, the per-platform breakdown in their dashboard, or simply replying to this email with questions) before the sign-off.
+
+FACTS:
+{
+  "todays_date": "10 January 2026",
+  "author_first_name": "Rohit",
+  "author_full_name": "Rohit Kapoor",
+  "published_books": [
+    {
+      "title": "Code & Karma",
+      "genre": "Self-Help / Technology",
+      "published_on": "14 February 2023",
+      "available_on": [
+        "Amazon India",
+        "Flipkart",
+        "Amazon US",
+        "BookLeaf Store"
+      ],
+      "copies_sold": "876",
+      "royalty_per_copy": "₹30",
+      "royalty_earned": "₹26,280",
+      "royalty_paid": "₹21,000",
+      "royalty_pending": "₹5,280",
+      "last_payout": "1 September 2025",
+      "payout_status": "overdue"
+    },
+    {
+      "title": "Startup Sutra",
+      "genre": "Business / Entrepreneurship",
+      "published_on": "22 May 2024",
+      "available_on": [
+        "Amazon India",
+        "Flipkart",
+        "Amazon US",
+        "Amazon UK",
+        "BookLeaf Store"
+      ],
+      "copies_sold": "1,203",
+      "royalty_per_copy": "₹48",
+      "royalty_earned": "₹57,744",
+      "royalty_paid": "₹50,000",
+      "royalty_pending": "₹7,744",
+      "last_payout": "15 November 2025",
+      "payout_status": "pending_on_schedule"
+    }
+  ],
+  "books_in_production": [],
+  "totals": {
+    "copies_sold": "2,079",
+    "royalty_earned": "₹84,024",
+    "royalty_paid": "₹71,000",
+    "royalty_pending": "₹13,024"
+  },
+  "payout": {
+    "scenario": "overdue",
+    "overdue_books": [
+      "Code & Karma"
+    ],
+    "on_schedule_books": [
+      "Startup Sutra"
+    ],
+    "next_payout_deadline": "14 February 2026",
+    "quarter_covered_by_next_payout": "October to December 2025",
+    "minimum_payout": "₹1,000",
+    "escalation_window": "48 hours"
+  }
+}
+
+===== GENERATION CONFIG =====
+
+{
+  "temperature": 0.4,
+  "maxOutputTokens": 2048,
+  "responseMimeType": "application/json",
+  "responseSchema": {
+    "type": "OBJECT",
+    "properties": {
+      "subject": {
+        "type": "STRING"
+      },
+      "body": {
+        "type": "STRING"
+      }
+    },
+    "required": [
+      "subject",
+      "body"
+    ]
+  },
+  "thinkingConfig": {
+    "thinkingLevel": "MINIMAL"
+  }
+}
+
+~1163 input tokens (rough estimate: characters / 4)

@@ -1,0 +1,17 @@
+{
+  "name": "bookleaf-royalty-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "n8n workflow, Bubble import file and tests for the BookLeaf Author Royalty Dashboard (Assignment 2)",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test n8n/test/code-nodes.test.mjs",
+    "build:workflow": "node n8n/build-workflow.mjs",
+    "statuses": "node scripts/expected-statuses.mjs",
+    "import:json": "node scripts/build-import-json.mjs",
+    "preview": "node scripts/preview-prompt.mjs"
+  }
+}
