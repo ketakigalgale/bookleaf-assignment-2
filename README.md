@@ -11,7 +11,7 @@ Bubble app for authors and the BookLeaf ops team, n8n for the automation, and Ge
 
 Any other author from the dataset can make a login from the index page with **Sign Up** using their dataset email (for example sneha.kulkarni@email.com). The account gets linked to their author record automatically.
 
-**Screen recording:** TODO
+**Screen recording:** https://www.loom.com/share/68f48fa5d75a4322821accb6f92acc32
 
 **n8n workflow export:** `n8n/bookleaf-royalty-summary.workflow.json`
 
