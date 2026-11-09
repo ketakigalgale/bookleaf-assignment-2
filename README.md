@@ -134,7 +134,8 @@ There is no spinner: the log row is created first, so it always ends up as Succe
 
 ## 8. What I couldn't finish, and what I'd change
 
-- **Bulk send button.** It needs a loop that calls n8n once per author. In Bubble that loop is "Schedule API workflow on a list", which runs a backend workflow, and backend workflows can't make the API call on the free plan. On a paid plan the backend workflow I already built (`trigger_summary_for_author`) would be scheduled on all authors with pending royalties, 5 seconds apart. n8n already accepts `trigger_type = "Bulk"`.
+- **Bulk send button (not built).** It needs a loop that calls n8n once per author. My first plan was "Schedule API workflow on a list", which runs the backend workflow I already built (`trigger_summary_for_author`) for every author with pending royalties, 5 seconds apart. That approach is blocked on the free plan because backend workflows can't make the API Connector call.
+  A front-end loop would work on the free plan: the button puts all authors with pending royalties into a list in a page custom state, and a custom event takes the first author, runs the same steps as the Generate & Send button (create log, call n8n, save the result), removes that author from the list, and schedules itself again 5 seconds later until the list is empty. The admin would need to keep the page open while it runs. I worked this out late and didn't have time to build and test it before the deadline. The n8n side needs no change, since it already accepts `trigger_type = "Bulk"`.
 - **Collaborator access**: Bubble asked for an upgrade when I tried to invite.
 - The name search is case-sensitive, and the city/status dropdowns have no "All" option, so clearing a filter needs a page refresh.
 - The ₹1,000 minimum is handled in the email but not in the badge and filter, so AUTH009 shows red in the UI.
@@ -158,4 +159,4 @@ The most useful skill was **debugging across two systems**. When the log stayed 
 
 I used AI tools while building: for planning the structure, for the n8n code, and Bubble's own AI agent for some page layouts. Once the agent hid everything on the admin page, so I reverted its change and fixed the page by hand. I made sure I understand every workflow and n8n node so I can explain them.
 
-With more time I'd make the royalty view a reusable element shared by the author and admin pages, add a reset button to the filters, and on a paid plan move the n8n call back to a backend workflow so bulk send works.
+With more time I'd make the royalty view a reusable element shared by the author and admin pages, add a reset button to the filters, and build the bulk send as a front-end loop.
